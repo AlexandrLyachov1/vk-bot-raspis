@@ -7,7 +7,7 @@ from datetime import date
 import random
 import json
 import calendar
-
+import requests
 
 import data
 time = datetime.datetime.now()
@@ -17,7 +17,12 @@ day = 0
 now = datetime.datetime.now()
 my_date = date.today()
 photo = 'photo-202020100_457239018'
-
+url = 'http://api.openweathermap.org/data/2.5/weather?q=moscow,ru&appid=f765a62486dd5839cfc0051699c8d603'
+response = requests.get(url)
+jsonfile = response.json()
+Kalvin = 273
+JSKalvin = int(jsonfile['main']['temp'])
+TEMPMSK = JSKalvin- Kalvin
 def getDATAS():
     firstDay = 2
     firstMonth = 9
@@ -165,7 +170,7 @@ def vksSend():
     print(peer_id)
     vk.messages.send(
             peer_id=peer_id,
-            message="Сегодня день: "+timeday+ "  месяц:"+timeMo+" неделя "+ week+"\n"+"Какое расписание вам нужно",
+            message="Сегодня день: "+timeday+ "  месяц:"+timeMo+" Температура сегодня градус "+ str(TEMPMSK)+ "C"+"\n"+"Какое расписание вам нужно",
             random_id=get_random_id(),
             attachment=naSegodnya(),
             keyboard=keyboard.get_keyboard(),
@@ -210,8 +215,17 @@ while True:
             elif text.lower() == 'на завтра':  
                 zavtra()
             else:
+                keyboard = VkKeyboard(inline=True)
+                # keyboard.add_button('На вчера')
+                keyboard.add_button('На сегодня')
+                keyboard.add_button('На завтра')
+                if ( getDATAS() == 1):
+                    week = "Четная"
+                else:
+                    week = "Нечетная"
                 vk.messages.send(
                 peer_id=peer_id,
-                message='Напиши Start',
+                message='Выбери на какой день тебе расписание нужно',
                 random_id=get_random_id(),
+                keyboard=keyboard.get_keyboard(),
                 )
